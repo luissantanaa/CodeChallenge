@@ -85,6 +85,49 @@ class Command(BaseCommand):
 
 This script runs several "python manage.py" commands. The first to refer to the migrations required by the database. The third one loads the data from the file "users.json". This file contains information regarding two users of the django app, one with admin access and a guest. This allows us to create users automatically on startup.  
 
+### Models  
+```
+from django.contrib.gis.db import models
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
+
+# Class defines the Road Segment model
+class roadsegment(models.Model):
+
+	# defines possible characterization choices
+	Characterization_choices = [
+		('High', 'High'),
+		('Moderate', 'Moderate'),
+		('Low', 'Low')
+	]
+
+	# defines possible intensity choices
+	intensity_choices = [
+		('2', '2'),
+		('1', '1'),
+		('0', '0')
+	]
+
+	# Road Segment Fields
+	ID = models.AutoField(primary_key=True)
+	Long_start = models.FloatField()
+	Lat_start = models.FloatField()
+	Long_end = models.FloatField()
+	Lat_end = models.FloatField()
+	Length = models.FloatField()
+	Speed = models.FloatField()
+	Intensity = models.CharField(max_length=1, choices=intensity_choices, default='99')
+	Characterization = models.CharField(max_length=8, choices=Characterization_choices, default='default')
+	Segment_start = models.PointField(blank=True, null=True)
+	Segment_end = models.PointField(blank=True, null=True)
+	Segment = models.LineStringField(blank=True, null=True)
+```
+
+The models.py defines the Road Segment object. This object contains several fields such as an id which is the primary key of the object, many float fields such as Long_Start, Speed etc. The Intensity and Characterization charfields use the 'Characterization_choices' and 'intensity_choices' to define the only values that these fields might have assigned to them. The Segment_Start and Segment_End point fields represent, respectively, the start point and the end point of the segment. The Segment field is a LineStringField that unites the start and end points.
+
 ### Views  
 
 The views.py file contains several methods which are executed when you call the endpoints.  
