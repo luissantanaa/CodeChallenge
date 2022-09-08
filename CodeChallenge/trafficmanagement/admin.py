@@ -6,4 +6,4 @@ admin.site.register(roadsegment)
 
 # Defines the details to show in admin page
 class RoadSegmentAdmin(admin.ModelAdmin):
-	list_display = ['ID', 'Long_start', 'Lat_start', 'Long_end', 'Lat_end', 'Length', 'Speed']
+	list_display = ['ID', 'Long_start', 'Lat_start', 'Long_end', 'Lat_end', 'Length', 'Speed', 'Segment_Start', 'Segment_End', 'Segment']

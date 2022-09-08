@@ -25,9 +25,9 @@ def update_database(request):
 	datareader = csv.DictReader(open(os.path.dirname(os.path.abspath(__file__)) + "/traffic_speed.csv"), delimiter=',')
 	for row in datareader:
 		intensity, characterization = characterize_traffic(float(row['Speed']))
-		segment_start, segment_end, segment = create_segment_points(float(row['Lat_start']), float(row['Lat_end']), float(row['Long_start']),
-							  float(row['Long_end']))
-
+		segment_start, segment_end, segment = create_segment_points(float(row['Lat_start']), float(row['Lat_end']),
+																	float(row['Long_start']),
+																	float(row['Long_end']))
 
 		segments.append(roadsegment(Long_start=row['Long_start'], Lat_start=row['Lat_start'],
 									Long_end=row['Long_end'],
@@ -88,13 +88,19 @@ def add_segment(request):
 	permission_classes = [permissions.IsAdminUser]  # Requires user to have admin permissions
 
 	request.data["Intensity"], request.data["Characterization"] = characterize_traffic(
-		request.data['Speed'])  # uses auxiliary function
-	# to characterize the segment based on speed
+		request.data['Speed'])  # uses auxiliary function to characterize the segment based on speed
+
+	request.data["segment_start"], request.data["segment_end"], request.data["segment"] = create_segment_points(
+		request.data['Lat_start'], request.data['Lat_end'],
+		request.data['Long_start'],
+		request.data['Long_end'])
+
 	serializer = RoadSegmentSerializer(data=request.data)
 	if serializer.is_valid():
 		serializer.save()
 		return Response("Added Road Segment", status=status.HTTP_201_CREATED)
 	return Response("Something went wrong", status=status.HTTP_400_BAD_REQUEST)
+
 
 
 ######################################################## PUT REQUESTS #########################
@@ -153,6 +159,7 @@ def characterize_traffic(speed):
 		characterization = "Low"
 
 	return [intensity, characterization]
+
 
 # Auxiliary function used to create the start and end points of the road segment.
 # Then creates a LineString describing the road segment
